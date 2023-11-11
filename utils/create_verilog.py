@@ -27,8 +27,8 @@ def create_verilog( mem ):
       V_file.write('   we_in,\n')
     for i in range(int(num_rwport)) :
       V_file.write('   wd_in,\n')
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   w_mask_in,\n')
+    for i in range(int(num_rwport)) :
+      V_file.write('   w_mask_in,\n')
     V_file.write('   clk,\n')
     V_file.write('   ce_in\n')
     V_file.write(');\n')
@@ -45,8 +45,8 @@ def create_verilog( mem ):
       V_file.write('   input                    we_in;\n')
     for i in range(int(num_rwport)) :
       V_file.write('   input  [BITS-1:0]        wd_in;\n')
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   input  [BITS-1:0]        w_mask_in;\n')
+    for i in range(int(num_rwport)) :
+      V_file.write('   input  [BITS-1:0]        w_mask_in;\n')
     V_file.write('   input                    clk;\n')
     V_file.write('   input                    ce_in;\n')
     V_file.write('\n')
@@ -71,8 +71,8 @@ def create_verilog( mem ):
       V_file.write('         end\n')
       V_file.write('         else if (we_in)\n')
       V_file.write('         begin\n')
-      V_file.write('            mem[addr_in] <= (wd_in) | (mem[addr_in]);\n')
-      #V_file.write('            mem[addr_in] <= (wd_in & w_mask_in) | (mem[addr_in] & ~w_mask_in);\n')
+      #V_file.write('            mem[addr_in] <= (wd_in) | (mem[addr_in]);\n')
+      V_file.write('            mem[addr_in] <= (wd_in & w_mask_in) | (mem[addr_in] & ~w_mask_in);\n')
       V_file.write('         end\n')
     V_file.write('         // read\n')
     for i in range(int(num_rwport)) :
@@ -134,8 +134,8 @@ def generate_verilog_bb( mem ):
       V_file.write('   we_in,\n')
     for i in range(int(num_rwport)) :
       V_file.write('   wd_in,\n')
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   w_mask_in,\n')
+    for i in range(int(num_rwport)) :
+      V_file.write('   w_mask_in,\n')
     V_file.write('   clk,\n')
     V_file.write('   ce_in\n')
     V_file.write(');\n')
@@ -152,8 +152,8 @@ def generate_verilog_bb( mem ):
       V_file.write('   input                    we_in;\n')
     for i in range(int(num_rwport)) :
       V_file.write('   input  [BITS-1:0]        wd_in;\n')
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   input  [BITS-1:0]        w_mask_in;\n')
+    for i in range(int(num_rwport)) :
+      V_file.write('   input  [BITS-1:0]        w_mask_in;\n')
     V_file.write('   input                    clk;\n')
     V_file.write('   input                    ce_in;\n')
     V_file.write('\n')

@@ -35,8 +35,8 @@ def create_lef( mem ):
     #########################################
     # Calculate the pin spacing (pitch)
     #########################################
-    # rd_out (#bits) + wd_in (#bits) + addr_in (#addr_width) + we_in/ce_in/clk
-    number_of_pins = 2*bits + addr_width + 3
+    # rd_out (#bits) + wd_in (#bits) + w_mask_in (#bits) + addr_in (#addr_width) + we_in/ce_in/clk
+    number_of_pins = 3*bits + addr_width + 3
     number_of_tracks_available = math.floor((h - 2*y_offset) / min_pin_pitch)
     number_of_spare_tracks = number_of_tracks_available - number_of_pins
 
@@ -82,6 +82,10 @@ def create_lef( mem ):
     ########################################
 
     y_step = y_offset - (y_offset % manufacturing_grid_um) + (mem.process.pin_width_um/2.0)
+    for i in range(int(bits)) :
+        y_step = lef_add_pin( fid, mem, 'w_mask_in[%d]'%i, True, y_step, pin_pitch )
+
+    y_step += group_pitch
     for i in range(int(bits)) :
         y_step = lef_add_pin( fid, mem, 'rd_out[%d]'%i, False, y_step, pin_pitch )
 
