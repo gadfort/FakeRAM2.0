@@ -30,7 +30,11 @@ def create_lib( mem ):
     fo4               = float(mem.fo4_ps)/1e3
 
     # Only support 1RW srams. At some point, expose these as well!
-    num_rwport = mem.rw_ports
+    num_rwport = int(mem.rw_ports)
+    if num_rwport == 1:
+      port_suffix = {0: ""}
+    else:
+      port_suffix = {n: f"_{chr(n+ord('A'))}" for n in range(num_rwport)}
 
     # Number of bits for address
     addr_width    = math.ceil(math.log2(mem.depth))
@@ -192,7 +196,7 @@ def create_lib( mem ):
     LIB_file.write('\n')
 
     for i in range(int(num_rwport)) :
-      LIB_file.write('    bus(rd_out)   {\n')
+      LIB_file.write('    bus(rd_out%s) {\n' % port_suffix[i])
       LIB_file.write('        bus_type : %s_DATA;\n' % name)
       LIB_file.write('        direction : output;\n')
       LIB_file.write('        max_capacitance : %.3f;\n' % max_load) ;# Based on 32x inverter being a common max (or near max) inverter
@@ -231,7 +235,7 @@ def create_lib( mem ):
       LIB_file.write('    }\n')
 
     for i in range(int(num_rwport)) :
-      LIB_file.write('    pin(we_in){\n')
+      LIB_file.write('    pin(we_in%s) {\n' % port_suffix[i])
       LIB_file.write('        direction : input;\n')
       LIB_file.write('        capacitance : %.3f;\n' % (min_driver_in_cap))
       LIB_file.write('        timing() {\n')
@@ -286,7 +290,7 @@ def create_lib( mem ):
       LIB_file.write('        }\n')
       LIB_file.write('    }\n')
 
-    LIB_file.write('    pin(ce_in){\n')
+    LIB_file.write('    pin(ce_in) {\n')
     LIB_file.write('        direction : input;\n')
     LIB_file.write('        capacitance : %.3f;\n' % (min_driver_in_cap))
     LIB_file.write('        timing() {\n')
@@ -342,7 +346,7 @@ def create_lib( mem ):
     LIB_file.write('    }\n')
 
     for i in range(int(num_rwport)) :
-      LIB_file.write('    bus(addr_in)   {\n')
+      LIB_file.write('    bus(addr_in%s) {\n' % port_suffix[i])
       LIB_file.write('        bus_type : %s_ADDRESS;\n' % name)
       LIB_file.write('        direction : input;\n')
       LIB_file.write('        capacitance : %.3f;\n' % (min_driver_in_cap))
@@ -399,7 +403,7 @@ def create_lib( mem ):
       LIB_file.write('    }\n')
 
     for i in range(int(num_rwport)) :
-      LIB_file.write('    bus(wd_in)   {\n')
+      LIB_file.write('    bus(wd_in%s) {\n' % port_suffix[i])
       LIB_file.write('        bus_type : %s_DATA;\n' % name)
       LIB_file.write('        memory_write() {\n')
       LIB_file.write('            address : addr_in;\n')

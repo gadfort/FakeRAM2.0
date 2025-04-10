@@ -28,6 +28,12 @@ def create_lef( mem ):
     metal_prefix     = mem.process.metal_prefix
     metal_layer      = mem.process.metal_layer
     column_mux_factor = mem.process.column_mux_factor
+
+    num_rwport = int(mem.rw_ports)
+    if num_rwport == 1:
+      port_suffix = {0: ("", "left")}
+    else:
+      port_suffix = {n: (f"_{chr(n+ord('A'))}", "left" if n%2==0 else "right") for n in range(num_rwport)}
  
     # Offset from bottom edge to first pin
     x_offset = 1 * min_pin_pitch   ;# as told by MSK 
@@ -54,7 +60,7 @@ def create_lef( mem ):
     pin_pitch = min_pin_pitch * track_count
     # Divide by the remaining 'spare' tracks into the inter-group spaces
     #  [4 groups -> 3 spaces]
-    extra = math.floor((number_of_tracks_available - number_of_pins*track_count) / 3)
+    extra = math.floor((number_of_tracks_available - number_of_pins*track_count) / 4)
     group_pitch = extra*mem.process.pin_pitch_um
     #########################################
     # LEF HEADER
@@ -83,20 +89,30 @@ def create_lef( mem ):
 
     y_step = y_offset - (y_offset % manufacturing_grid_um) + (mem.process.pin_width_um/2.0)
     for i in range(int(bits)) :
-        y_step = lef_add_pin( fid, mem, 'rd_out[%d]'%i, False, y_step, pin_pitch )
+        for n in range(num_rwport):
+          lef_add_pin( fid, mem, 'rd_out%s[%d]'%(port_suffix[n][0], i), False, y_step, pin_pitch, port_suffix[n][1] )
+        y_step += pin_pitch
 
     y_step += group_pitch
     for i in range(int(bits)) :
-        y_step = lef_add_pin( fid, mem, 'wd_in[%d]'%i, True, y_step, pin_pitch )
+        for n in range(num_rwport):
+          lef_add_pin( fid, mem, 'wd_in%s[%d]'%(port_suffix[n][0], i), True, y_step, pin_pitch, port_suffix[n][1] )
+        y_step += pin_pitch
 
     y_step += group_pitch
     for i in range(int(addr_width)) :
-        y_step = lef_add_pin( fid, mem, 'addr_in[%d]'%i, True, y_step, pin_pitch )
+        for n in range(num_rwport):
+          lef_add_pin( fid, mem, 'addr_in%s[%d]'%(port_suffix[n][0], i), True, y_step, pin_pitch, port_suffix[n][1] )
+        y_step += pin_pitch
 
     y_step += group_pitch
-    y_step = lef_add_pin( fid, mem, 'we_in', True, y_step, pin_pitch )
-    y_step = lef_add_pin( fid, mem, 'ce_in', True, y_step, pin_pitch )
-    y_step = lef_add_pin( fid, mem, 'clk',   True, y_step, pin_pitch )
+    for n in range(num_rwport):
+      lef_add_pin( fid, mem, 'we_in%s'%port_suffix[n][0], True, y_step, pin_pitch, port_suffix[n][1] )
+    y_step += pin_pitch
+    lef_add_pin( fid, mem, 'ce_in', True, y_step, pin_pitch )
+    y_step += pin_pitch
+    lef_add_pin( fid, mem, 'clk',   True, y_step, pin_pitch )
+    y_step += pin_pitch
 
     ########################################
     # Create VDD/VSS Strapes
@@ -155,7 +171,7 @@ def create_lef( mem ):
 #
 # Helper function that adds a signal pin
 # y_step = lef_add_pin( fid, mem, 'w_mask_in[%d]'%i, True, y_step, pin_pitch )
-def lef_add_pin( fid, mem, pin_name, is_input, y, pitch ):
+def lef_add_pin( fid, mem, pin_name, is_input, y, pitch, edge="left" ):
 
   layer = mem.process.metal_layer
   pw  = mem.process.pin_width_um
@@ -167,8 +183,9 @@ def lef_add_pin( fid, mem, pin_name, is_input, y, pitch ):
   fid.write('    SHAPE ABUTMENT ;\n')
   fid.write('    PORT\n')
   fid.write('      LAYER %s ;\n' % layer)
-  fid.write('      RECT %.3f %.3f %.3f %.3f ;\n' % (0, y-hpw, pw, y+hpw))
+  if edge == "left":
+    fid.write('      RECT %.3f %.3f %.3f %.3f ;\n' % (0, y-hpw, pw, y+hpw))
+  else:
+    fid.write('      RECT %.3f %.3f %.3f %.3f ;\n' % (mem.width_um-pw, y-hpw, mem.width_um, y+hpw))
   fid.write('    END\n')
   fid.write('  END %s\n' % pin_name)
-  
-  return y + pitch

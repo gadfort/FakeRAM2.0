@@ -27,6 +27,6 @@ def get_macro_dimensions(process, sram_data):
   all_bitcell_width = all_bitcell_width * column_mux_factor
 
   total_height = all_bitcell_height * 1.2
-  total_width = all_bitcell_width * 1.2
+  total_width = all_bitcell_width * 1.2 * math.sqrt(float(sram_data["rw_ports"]))
 
   return total_height, total_width
