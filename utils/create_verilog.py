@@ -31,8 +31,8 @@ def create_verilog( mem ):
       V_file.write('   we_in%s,\n' % port_suffix[i])
     for i in range(int(num_rwport)) :
       V_file.write('   wd_in%s,\n' % port_suffix[i])
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   w_mask_in,\n')
+    for i in range(int(num_rwport)) :
+     V_file.write('   w_mask_in%s,\n' % port_suffix[i])
     V_file.write('   clk,\n')
     V_file.write('   ce_in\n')
     V_file.write(');\n')
@@ -49,8 +49,8 @@ def create_verilog( mem ):
       V_file.write('   input                    we_in%s;\n' % port_suffix[i])
     for i in range(int(num_rwport)) :
       V_file.write('   input  [BITS-1:0]        wd_in%s;\n' % port_suffix[i])
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   input  [BITS-1:0]        w_mask_in;\n')
+    for i in range(int(num_rwport)) :
+     V_file.write('   input  [BITS-1:0]        w_mask_in%s;\n' % port_suffix[i])
     V_file.write('   input                    clk;\n')
     V_file.write('   input                    ce_in;\n')
     V_file.write('\n')
@@ -75,8 +75,8 @@ def create_verilog( mem ):
       V_file.write('         end\n')
       V_file.write('         else if (we_in)\n')
       V_file.write('         begin\n')
-      V_file.write('            mem[addr_in] <= (wd_in%s) | (mem[addr_in%s]);\n' % (port_suffix[i], port_suffix[i]))
-      #V_file.write('            mem[addr_in] <= (wd_in & w_mask_in) | (mem[addr_in] & ~w_mask_in);\n')
+      # V_file.write('            mem[addr_in%s] <= (wd_in%s) | (mem[addr_in%s]);\n' % (port_suffix[i], port_suffix[i], port_suffix[i]))
+      V_file.write('            mem[addr_in%s] <= (wd_in%s & w_mask_in%s) | (mem[addr_in%s] & ~w_mask_in%s);\n' % (port_suffix[i], port_suffix[i], port_suffix[i], port_suffix[i], port_suffix[i]))
       V_file.write('         end\n')
     V_file.write('         // read\n')
     for i in range(int(num_rwport)) :
@@ -106,7 +106,7 @@ def create_verilog( mem ):
       V_file.write('      $setuphold (posedge clk, ce_in%s,     0, 0, notifier);\n' % port_suffix[i])
       V_file.write('      $setuphold (posedge clk, addr_in%s,   0, 0, notifier);\n' % port_suffix[i])
       V_file.write('      $setuphold (posedge clk, wd_in%s,     0, 0, notifier);\n' % port_suffix[i])
-      #V_file.write('      $setuphold (posedge clk, w_mask_in, 0, 0, notifier);\n')
+      V_file.write('      $setuphold (posedge clk, w_mask_in%s, 0, 0, notifier);\n' % port_suffix[i])
     V_file.write('   endspecify\n')
     V_file.write('\n')
     V_file.write('endmodule\n')
@@ -164,8 +164,8 @@ def generate_verilog_bb( mem ):
       V_file.write('   input                    we_in%s;\n' % port_suffix[i])
     for i in range(int(num_rwport)) :
       V_file.write('   input  [BITS-1:0]        wd_in%s;\n' % port_suffix[i])
-    #for i in range(int(num_rwport)) :
-    #  V_file.write('   input  [BITS-1:0]        w_mask_in;\n')
+    for i in range(int(num_rwport)) :
+     V_file.write('   input  [BITS-1:0]        w_mask_in%s;\n' % port_suffix[i])
     V_file.write('   input                    clk;\n')
     V_file.write('   input                    ce_in;\n')
     V_file.write('\n')
