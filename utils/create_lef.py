@@ -28,7 +28,6 @@ def create_lef(mem):
     manufacturing_grid_um = mem.process.manufacturing_grid_um
     metal_prefix = mem.process.metal_prefix
     metal_layer = mem.process.metal_layer
-    column_mux_factor = mem.process.column_mux_factor
 
     num_rwport = int(mem.rw_ports)
     if num_rwport == 1:
@@ -90,7 +89,7 @@ def create_lef(mem):
     fid.write(f"  PROPERTY depth {depth} ;\n")
     fid.write(f"  PROPERTY banks {banks} ;\n")
     fid.write("  FOREIGN %s 0 0 ;\n" % (name))
-    fid.write("  SYMMETRY X Y R90 ;\n")
+    fid.write("  SYMMETRY X Y ;\n")
     fid.write("  SIZE %.3f BY %.3f ;\n" % (w, h))
     fid.write("  CLASS BLOCK ;\n")
 

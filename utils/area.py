@@ -7,6 +7,8 @@ def get_macro_dimensions(process, sram_data):
     depth = int(sram_data["depth"])
     num_banks = int(sram_data["banks"])
 
+    overhead = sram_data.get("access_overhead", 1.2)
+
     bitcell_height = process.bitcell_height_nm / 1000.0
     bitcell_width = process.bitcell_width_nm / 1000.0
 
@@ -22,7 +24,7 @@ def get_macro_dimensions(process, sram_data):
     all_bitcell_height = all_bitcell_height / column_mux_factor
     all_bitcell_width = all_bitcell_width * column_mux_factor
 
-    total_height = all_bitcell_height * 1.2
-    total_width = all_bitcell_width * 1.2 * math.sqrt(float(sram_data["rw_ports"]))
+    total_height = all_bitcell_height * overhead
+    total_width = all_bitcell_width * overhead * math.sqrt(float(sram_data["rw_ports"]))
 
     return total_height, total_width
