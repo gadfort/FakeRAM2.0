@@ -48,6 +48,7 @@ def get_args() -> argparse.Namespace:
 def main(args: argparse.Namespace):
 
     # Load the JSON configuration file
+    print(args.config)
     with open(args.config, "r") as fid:
         raw = [line.strip() for line in fid if not line.strip().startswith("#")]
     json_data = json.loads("\n".join(raw))
@@ -57,13 +58,12 @@ def main(args: argparse.Namespace):
 
     # Go through each sram and generate the lib, lef and v files
     for sram_data in json_data["srams"]:
+        print(sram_data)
         memory = Memory(process, sram_data, args.output_dir)
         create_lib(memory)
         create_lef(memory)
         create_verilog(memory)
 
 
-### Entry point
 if __name__ == "__main__":
-    args = get_args()
-    main(args)
+    main(get_args())

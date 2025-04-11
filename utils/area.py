@@ -1,19 +1,14 @@
-import os
-import sys
 import math
 
 
 def get_macro_dimensions(process, sram_data):
-    contacted_poly_pitch_um = process.contacted_poly_pitch_nm / 1000
     column_mux_factor = process.column_mux_factor
-    fin_pitch_um = process.fin_pitch_nm / 1000
     width_in_bits = int(sram_data["width"])
     depth = int(sram_data["depth"])
     num_banks = int(sram_data["banks"])
 
-    # Corresponds to the recommended 122 cell in asap7
-    bitcell_height = 10 * fin_pitch_um
-    bitcell_width = 2 * contacted_poly_pitch_um
+    bitcell_height = process.bitcell_height_nm / 1000.0
+    bitcell_width = process.bitcell_width_nm / 1000.0
 
     all_bitcell_height = bitcell_height * depth
     all_bitcell_width = bitcell_width * width_in_bits
