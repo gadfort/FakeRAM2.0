@@ -15,7 +15,7 @@ def get_macro_dimensions(process, sram_data):
     all_bitcell_height = bitcell_height * depth
     all_bitcell_width = bitcell_width * width_in_bits
 
-    if num_banks == 2 or num_banks == 4:
+    if num_banks in (2, 4, 8):
         all_bitcell_height = all_bitcell_height / num_banks
         all_bitcell_width = all_bitcell_width * num_banks
     elif num_banks != 1:
