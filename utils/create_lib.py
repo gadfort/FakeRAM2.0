@@ -477,7 +477,7 @@ def create_lib(mem):
         LIB_file.write("            }\n")
         LIB_file.write("        }\n")
         LIB_file.write("        internal_power(){\n")
-        LIB_file.write('            when : "(! (we_in) )";\n')
+        LIB_file.write('            when : "(! (we_in%s) )";\n' % port_suffix[i])
         LIB_file.write("            rise_power(%s_energy_template_sigslew) {\n" % name)
         LIB_file.write('                index_1 ("%s");\n' % slew_indicies)
         LIB_file.write(
@@ -492,7 +492,7 @@ def create_lib(mem):
         LIB_file.write("            }\n")
         LIB_file.write("        }\n")
         LIB_file.write("        internal_power(){\n")
-        LIB_file.write('            when : "(we_in)";\n')
+        LIB_file.write('            when : "(we_in%s)";\n' % port_suffix[i])
         LIB_file.write("            rise_power(%s_energy_template_sigslew) {\n" % name)
         LIB_file.write('                index_1 ("%s");\n' % slew_indicies)
         LIB_file.write(
@@ -558,7 +558,7 @@ def create_lib(mem):
         LIB_file.write("            }\n")
         LIB_file.write("        }\n")
         LIB_file.write("        internal_power(){\n")
-        LIB_file.write('            when : "(! (we_in) )";\n')
+        LIB_file.write('            when : "(! (we_in%s) )";\n' % port_suffix[i])
         LIB_file.write("            rise_power(%s_energy_template_sigslew) {\n" % name)
         LIB_file.write('                index_1 ("%s");\n' % slew_indicies)
         LIB_file.write(
@@ -573,7 +573,7 @@ def create_lib(mem):
         LIB_file.write("            }\n")
         LIB_file.write("        }\n")
         LIB_file.write("        internal_power(){\n")
-        LIB_file.write('            when : "(we_in)";\n')
+        LIB_file.write('            when : "(we_in%s)";\n' % port_suffix[i])
         LIB_file.write("            rise_power(%s_energy_template_sigslew) {\n" % name)
         LIB_file.write('                index_1 ("%s");\n' % slew_indicies)
         LIB_file.write(
