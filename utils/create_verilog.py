@@ -34,8 +34,13 @@ def create_verilog(mem):
         V_file.write("   wd_in%s,\n" % port_suffix[i])
     for i in range(int(num_rwport)):
         V_file.write("   w_mask_in%s,\n" % port_suffix[i])
-    V_file.write("   clk,\n")
-    V_file.write("   ce_in\n")
+    if mem.unique_clocks:
+        for i in range(int(num_rwport)):
+            V_file.write("   clk%s,\n" % port_suffix[i])
+            V_file.write("   ce_in%s,\n" % port_suffix[i])
+    else:
+        V_file.write("   clk,\n")
+        V_file.write("   ce_in\n")
     V_file.write(");\n")
     V_file.write("   parameter BITS = %s;\n" % str(bits))
     V_file.write("   parameter WORD_DEPTH = %s;\n" % str(depth))
@@ -52,103 +57,202 @@ def create_verilog(mem):
         V_file.write("   input  [BITS-1:0]        wd_in%s;\n" % port_suffix[i])
     for i in range(int(num_rwport)):
         V_file.write("   input  [BITS-1:0]        w_mask_in%s;\n" % port_suffix[i])
-    V_file.write("   input                    clk;\n")
-    V_file.write("   input                    ce_in;\n")
+    if mem.unique_clocks:
+        for i in range(int(num_rwport)):
+            V_file.write("   input                    clk%s;\n" % port_suffix[i])
+            V_file.write("   input                    ce_in%s;\n" % port_suffix[i])
+    else:
+        V_file.write("   input                    clk;\n")
+        V_file.write("   input                    ce_in;\n")
     V_file.write("\n")
     V_file.write("   reg    [BITS-1:0]        mem [0:WORD_DEPTH-1];\n")
     V_file.write("\n")
-    V_file.write("   integer j;\n")
-    V_file.write("\n")
-    V_file.write("   always @(posedge clk)\n")
-    V_file.write("   begin\n")
-    V_file.write("      if (ce_in)\n")
-    V_file.write("      begin\n")
-    for i in range(int(num_rwport)):
-        V_file.write(
-            "         //if ((we_in%s !== 1'b1 && we_in%s !== 1'b0) && corrupt_mem_on_X_p)\n"
-            % (port_suffix[i], port_suffix[i])
-        )
-        V_file.write("         if (corrupt_mem_on_X_p &&\n")
-        V_file.write(
-            "             ((^we_in%s === 1'bx) || (^addr_in%s === 1'bx))\n"
-            % (port_suffix[i], port_suffix[i])
-        )
-        V_file.write("            )\n")
-        V_file.write("         begin\n")
-        V_file.write(
-            "            // WEN or ADDR is unknown, so corrupt entire array (using unsynthesizeable for loop)\n"
-        )
-        V_file.write("            for (j = 0; j < WORD_DEPTH; j = j + 1)\n")
-        V_file.write("               mem[j] <= 'x;\n")
-        V_file.write(
-            f'            $display("warning: ce_in=1, we_in{port_suffix[i]} is %b, addr_in{port_suffix[i]} = %x in '
-            + name
-            + '", we_in%s, addr_in%s);\n' % (port_suffix[i], port_suffix[i])
-        )
-        V_file.write("         end\n")
-        V_file.write("         else if (we_in)\n")
-        V_file.write("         begin\n")
-        # V_file.write('            mem[addr_in%s] <= (wd_in%s) | (mem[addr_in%s]);\n' % (port_suffix[i], port_suffix[i], port_suffix[i]))
-        V_file.write(
-            "            mem[addr_in%s] <= (wd_in%s & w_mask_in%s) | (mem[addr_in%s] & ~w_mask_in%s);\n"
-            % (
-                port_suffix[i],
-                port_suffix[i],
-                port_suffix[i],
-                port_suffix[i],
-                port_suffix[i],
+    if mem.unique_clocks:
+        for i in range(int(num_rwport)):
+            V_file.write("   integer j;\n")
+            V_file.write("\n")
+            V_file.write("   always @(posedge clk%s)\n" % port_suffix[i])
+            V_file.write("   begin\n")
+            V_file.write("      if (ce_in%s)\n" % port_suffix[i])
+            V_file.write("      begin\n")
+            V_file.write(
+                "         //if ((we_in%s !== 1'b1 && we_in%s !== 1'b0) && corrupt_mem_on_X_p)\n"
+                % (port_suffix[i], port_suffix[i])
             )
-        )
-        V_file.write("         end\n")
-    V_file.write("         // read\n")
-    for i in range(int(num_rwport)):
+            V_file.write("         if (corrupt_mem_on_X_p &&\n")
+            V_file.write(
+                "             ((^we_in%s === 1'bx) || (^addr_in%s === 1'bx))\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write("            )\n")
+            V_file.write("         begin\n")
+            V_file.write(
+                "            // WEN or ADDR is unknown, so corrupt entire array (using unsynthesizeable for loop)\n"
+            )
+            V_file.write("            for (j = 0; j < WORD_DEPTH; j = j + 1)\n")
+            V_file.write("               mem[j] <= 'x;\n")
+            V_file.write(
+                f'            $display("warning: ce_in=1, we_in{port_suffix[i]} is %b, addr_in{port_suffix[i]} = %x in '
+                + name
+                + '", we_in%s, addr_in%s);\n' % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write("         end\n")
+            V_file.write("         else if (we_in%s)\n" % port_suffix[i])
+            V_file.write("         begin\n")
+            # V_file.write('            mem[addr_in%s] <= (wd_in%s) | (mem[addr_in%s]);\n' % (port_suffix[i], port_suffix[i], port_suffix[i]))
+            V_file.write(
+                "            mem[addr_in%s] <= (wd_in%s & w_mask_in%s) | (mem[addr_in%s] & ~w_mask_in%s);\n"
+                % (
+                    port_suffix[i],
+                    port_suffix[i],
+                    port_suffix[i],
+                    port_suffix[i],
+                    port_suffix[i],
+                )
+            )
+            V_file.write("         end\n")
+            V_file.write("         // read\n")
+            V_file.write(
+                "         rd_out%s <= mem[addr_in%s];\n" % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write("      end\n")
+            V_file.write("      else\n")
+            V_file.write("      begin\n")
+            V_file.write("         // Make sure read fails if ce_in is low\n")
+            V_file.write("         rd_out%s <= 'x;\n" % port_suffix[i])
+            V_file.write("      end\n")
+            V_file.write("   end\n")
+            V_file.write("\n")
+
         V_file.write(
-            "         rd_out%s <= mem[addr_in%s];\n" % (port_suffix[i], port_suffix[i])
+            "   // Timing check placeholders (will be replaced during SDF back-annotation)\n"
         )
-    V_file.write("      end\n")
-    V_file.write("      else\n")
-    V_file.write("      begin\n")
-    V_file.write("         // Make sure read fails if ce_in is low\n")
-    for i in range(int(num_rwport)):
-        V_file.write("         rd_out%s <= 'x;\n" % port_suffix[i])
-    V_file.write("      end\n")
-    V_file.write("   end\n")
-    V_file.write("\n")
-    V_file.write(
-        "   // Timing check placeholders (will be replaced during SDF back-annotation)\n"
-    )
-    V_file.write("   reg notifier;\n")
-    for i in range(int(num_rwport)):
+
+        V_file.write("   reg notifier;\n")
         V_file.write("   specify\n")
-        V_file.write("      // Delay from clk to rd_out\n")
-        V_file.write("      (posedge clk *> rd_out%s) = (0, 0);\n" % port_suffix[i])
-    V_file.write("\n")
-    V_file.write("      // Timing checks\n")
-    V_file.write("      $width     (posedge clk,            0, 0, notifier);\n")
-    V_file.write("      $width     (negedge clk,            0, 0, notifier);\n")
-    V_file.write("      $period    (posedge clk,            0,    notifier);\n")
-    for i in range(int(num_rwport)):
+        for i in range(int(num_rwport)):
+            V_file.write("      // Delay from clk to rd_out\n")
+            V_file.write("      (posedge clk%s *> rd_out%s) = (0, 0);\n" % (port_suffix[i], port_suffix[i]))
+        V_file.write("\n")
+        V_file.write("      // Timing checks\n")
+        for i in range(int(num_rwport)):
+            V_file.write("      $width     (posedge clk%s,            0, 0, notifier);\n" % port_suffix[i])
+            V_file.write("      $width     (negedge clk%s,            0, 0, notifier);\n" % port_suffix[i])
+            V_file.write("      $period    (posedge clk%s,            0,    notifier);\n" % port_suffix[i])
+            V_file.write(
+                "      $setuphold (posedge clk%s, we_in%s,     0, 0, notifier);\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write(
+                "      $setuphold (posedge clk%s, ce_in%s,     0, 0, notifier);\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write(
+                "      $setuphold (posedge clk%s, addr_in%s,   0, 0, notifier);\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write(
+                "      $setuphold (posedge clk%s, wd_in%s,     0, 0, notifier);\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write(
+                "      $setuphold (posedge clk%s, w_mask_in%s, 0, 0, notifier);\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+        V_file.write("   endspecify\n")
+    else:
+        V_file.write("   integer j;\n")
+        V_file.write("\n")
+        V_file.write("   always @(posedge clk)\n")
+        V_file.write("   begin\n")
+        V_file.write("      if (ce_in)\n")
+        V_file.write("      begin\n")
+        for i in range(int(num_rwport)):
+            V_file.write(
+                "         //if ((we_in%s !== 1'b1 && we_in%s !== 1'b0) && corrupt_mem_on_X_p)\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write("         if (corrupt_mem_on_X_p &&\n")
+            V_file.write(
+                "             ((^we_in%s === 1'bx) || (^addr_in%s === 1'bx))\n"
+                % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write("            )\n")
+            V_file.write("         begin\n")
+            V_file.write(
+                "            // WEN or ADDR is unknown, so corrupt entire array (using unsynthesizeable for loop)\n"
+            )
+            V_file.write("            for (j = 0; j < WORD_DEPTH; j = j + 1)\n")
+            V_file.write("               mem[j] <= 'x;\n")
+            V_file.write(
+                f'            $display("warning: ce_in=1, we_in{port_suffix[i]} is %b, addr_in{port_suffix[i]} = %x in '
+                + name
+                + '", we_in%s, addr_in%s);\n' % (port_suffix[i], port_suffix[i])
+            )
+            V_file.write("         end\n")
+            V_file.write("         else if (we_in%s)\n" % port_suffix[i])
+            V_file.write("         begin\n")
+            # V_file.write('            mem[addr_in%s] <= (wd_in%s) | (mem[addr_in%s]);\n' % (port_suffix[i], port_suffix[i], port_suffix[i]))
+            V_file.write(
+                "            mem[addr_in%s] <= (wd_in%s & w_mask_in%s) | (mem[addr_in%s] & ~w_mask_in%s);\n"
+                % (
+                    port_suffix[i],
+                    port_suffix[i],
+                    port_suffix[i],
+                    port_suffix[i],
+                    port_suffix[i],
+                )
+            )
+            V_file.write("         end\n")
+        V_file.write("         // read\n")
+        for i in range(int(num_rwport)):
+            V_file.write(
+                "         rd_out%s <= mem[addr_in%s];\n" % (port_suffix[i], port_suffix[i])
+            )
+        V_file.write("      end\n")
+        V_file.write("      else\n")
+        V_file.write("      begin\n")
+        V_file.write("         // Make sure read fails if ce_in is low\n")
+        for i in range(int(num_rwport)):
+            V_file.write("         rd_out%s <= 'x;\n" % port_suffix[i])
+        V_file.write("      end\n")
+        V_file.write("   end\n")
+        V_file.write("\n")
         V_file.write(
-            "      $setuphold (posedge clk, we_in%s,     0, 0, notifier);\n"
-            % port_suffix[i]
+            "   // Timing check placeholders (will be replaced during SDF back-annotation)\n"
         )
-        V_file.write(
-            "      $setuphold (posedge clk, ce_in%s,     0, 0, notifier);\n"
-            % port_suffix[i]
-        )
-        V_file.write(
-            "      $setuphold (posedge clk, addr_in%s,   0, 0, notifier);\n"
-            % port_suffix[i]
-        )
-        V_file.write(
-            "      $setuphold (posedge clk, wd_in%s,     0, 0, notifier);\n"
-            % port_suffix[i]
-        )
-        V_file.write(
-            "      $setuphold (posedge clk, w_mask_in%s, 0, 0, notifier);\n"
-            % port_suffix[i]
-        )
-    V_file.write("   endspecify\n")
+        V_file.write("   reg notifier;\n")
+        V_file.write("   specify\n")
+        for i in range(int(num_rwport)):
+            V_file.write("      // Delay from clk to rd_out\n")
+            V_file.write("      (posedge clk *> rd_out%s) = (0, 0);\n" % port_suffix[i])
+        V_file.write("\n")
+        V_file.write("      // Timing checks\n")
+        V_file.write("      $width     (posedge clk,            0, 0, notifier);\n")
+        V_file.write("      $width     (negedge clk,            0, 0, notifier);\n")
+        V_file.write("      $period    (posedge clk,            0,    notifier);\n")
+        for i in range(int(num_rwport)):
+            V_file.write(
+                "      $setuphold (posedge clk, we_in%s,     0, 0, notifier);\n"
+                % port_suffix[i]
+            )
+            V_file.write(
+                "      $setuphold (posedge clk, ce_in%s,     0, 0, notifier);\n"
+                % port_suffix[i]
+            )
+            V_file.write(
+                "      $setuphold (posedge clk, addr_in%s,   0, 0, notifier);\n"
+                % port_suffix[i]
+            )
+            V_file.write(
+                "      $setuphold (posedge clk, wd_in%s,     0, 0, notifier);\n"
+                % port_suffix[i]
+            )
+            V_file.write(
+                "      $setuphold (posedge clk, w_mask_in%s, 0, 0, notifier);\n"
+                % port_suffix[i]
+            )
+        V_file.write("   endspecify\n")
     V_file.write("\n")
     V_file.write("endmodule\n")
 
@@ -189,10 +293,13 @@ def generate_verilog_bb(mem):
         V_file.write("   we_in%s,\n" % port_suffix[i])
     for i in range(int(num_rwport)):
         V_file.write("   wd_in%s,\n" % port_suffix[i])
-    # for i in range(int(num_rwport)) :
-    #  V_file.write('   w_mask_in,\n')
-    V_file.write("   clk,\n")
-    V_file.write("   ce_in\n")
+    if mem.unique_clocks:
+        for i in range(int(num_rwport)):
+            V_file.write("   clk%s,\n" % port_suffix[i])
+            V_file.write("   ce_in%s,\n" % port_suffix[i])
+    else:
+        V_file.write("   clk,\n")
+        V_file.write("   ce_in\n")
     V_file.write(");\n")
     V_file.write("   parameter BITS = %s;\n" % str(bits))
     V_file.write("   parameter WORD_DEPTH = %s;\n" % str(depth))

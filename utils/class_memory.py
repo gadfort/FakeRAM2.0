@@ -29,6 +29,7 @@ class Memory:
         self.rw_ports = int(sram_data["rw_ports"])
         if self.rw_ports > 2:
             raise ValueError("one or two ports are supported")
+        self.unique_clocks = sram_data.get("unique_clocks", False)
         self.width_in_bytes = math.ceil(self.width_in_bits / 8.0)
         self.total_size = self.width_in_bytes * self.depth
         if output_dir:  # Output dir was set by command line option
@@ -43,7 +44,6 @@ class Memory:
         self.associativity = 1
 
         self.height_um, self.width_um = get_macro_dimensions(process, sram_data)
-        self.area_um2 = self.width_um * self.height_um
 
         self.tech_node_um = self.tech_node_nm / 1000.0
 
@@ -58,6 +58,7 @@ class Memory:
         ) / 1000.0
         print("Total Bitcell Height is", self.height_um)
         print("Total Bitcell Width is", self.width_um)
+        self.area_um2 = self.width_um * self.height_um
 
         ## DUMMY (FOR NOW) VALUES FOR LIB CREATION
         self.t_setup_ns = 0.050

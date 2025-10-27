@@ -168,10 +168,17 @@ def create_lef(mem):
             port_suffix[n][1],
         )
     y_step += pin_pitch
-    lef_add_pin(fid, mem, "ce_in", True, y_step, pin_pitch)
-    y_step += pin_pitch
-    lef_add_pin(fid, mem, "clk", True, y_step, pin_pitch)
-    y_step += pin_pitch
+    if mem.unique_clocks:
+        for n in range(num_rwport):
+            lef_add_pin(fid, mem, "ce_in%s" % port_suffix[n][0], True, y_step, pin_pitch)
+            y_step += pin_pitch
+            lef_add_pin(fid, mem, "clk%s" % port_suffix[n][0], True, y_step, pin_pitch)
+            y_step += pin_pitch
+    else:
+        lef_add_pin(fid, mem, "ce_in", True, y_step, pin_pitch)
+        y_step += pin_pitch
+        lef_add_pin(fid, mem, "clk", True, y_step, pin_pitch)
+        y_step += pin_pitch
 
     ########################################
     # Create VDD/VSS Strapes

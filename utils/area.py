@@ -27,4 +27,8 @@ def get_macro_dimensions(process, sram_data):
     total_height = all_bitcell_height * overhead
     total_width = all_bitcell_width * overhead * math.sqrt(float(sram_data["rw_ports"]))
 
+    if "unique_clocks" in sram_data and sram_data["unique_clocks"]:
+        total_height *= 1.1
+        total_width *= 1.1
+
     return total_height, total_width
