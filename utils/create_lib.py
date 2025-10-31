@@ -313,7 +313,7 @@ def create_lib(mem):
         LIB_file.write('                  "%.3f, %.3f" \\\n' % (tsetup, tsetup))
         LIB_file.write("                )\n")
         LIB_file.write("            }\n")
-        LIB_file.write("        } \n")
+        LIB_file.write("        }\n")
         LIB_file.write("        timing() {\n")
         if mem.unique_clocks:
             LIB_file.write('            related_pin : clk%s ;\n' % port_suffix[i])
@@ -377,7 +377,7 @@ def create_lib(mem):
             LIB_file.write('                  "%.3f, %.3f" \\\n' % (tsetup, tsetup))
             LIB_file.write("                )\n")
             LIB_file.write("            }\n")
-            LIB_file.write("        } \n")
+            LIB_file.write("        }\n")
             LIB_file.write("        timing() {\n")
             LIB_file.write("            related_pin : clk%s;\n" % port_suffix[i])
             LIB_file.write("            timing_type : hold_rising ;\n")
@@ -432,7 +432,7 @@ def create_lib(mem):
         LIB_file.write('                  "%.3f, %.3f" \\\n' % (tsetup, tsetup))
         LIB_file.write("                )\n")
         LIB_file.write("            }\n")
-        LIB_file.write("        } \n")
+        LIB_file.write("        }\n")
         LIB_file.write("        timing() {\n")
         LIB_file.write("            related_pin : clk;\n")
         LIB_file.write("            timing_type : hold_rising ;\n")
@@ -493,7 +493,7 @@ def create_lib(mem):
         LIB_file.write('                  "%.3f, %.3f" \\\n' % (tsetup, tsetup))
         LIB_file.write("                )\n")
         LIB_file.write("            }\n")
-        LIB_file.write("        } \n")
+        LIB_file.write("        }\n")
         LIB_file.write("        timing() {\n")
         if mem.unique_clocks:
             LIB_file.write('            related_pin : clk%s ;\n' % port_suffix[i])
@@ -567,7 +567,7 @@ def create_lib(mem):
         LIB_file.write('                  "%.3f, %.3f" \\\n' % (tsetup, tsetup))
         LIB_file.write("                )\n")
         LIB_file.write("            }\n")
-        LIB_file.write("        } \n")
+        LIB_file.write("        }\n")
         LIB_file.write("        timing() {\n")
         if mem.unique_clocks:
             LIB_file.write('            related_pin : clk%s ;\n' % port_suffix[i])
@@ -657,7 +657,7 @@ def create_lib(mem):
         LIB_file.write('                  "%.3f, %.3f" \\\n' % (tsetup, tsetup))
         LIB_file.write("                )\n")
         LIB_file.write("            }\n")
-        LIB_file.write("        } \n")
+        LIB_file.write("        }\n")
         LIB_file.write("        timing() {\n")
         if mem.unique_clocks:
             LIB_file.write('            related_pin : clk%s ;\n' % port_suffix[i])
